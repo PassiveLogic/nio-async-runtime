@@ -353,3 +353,6 @@ public final class AsyncEventLoop: EventLoop, @unchecked Sendable {
     init(_ value: T) { self.value = value }
   }
 }
+
+@available(macOS 14.0, iOS 17.0, watchOS 10.0, tvOS 17.0, *)
+extension AsyncEventLoop: NIOSerialEventLoopExecutor {}
