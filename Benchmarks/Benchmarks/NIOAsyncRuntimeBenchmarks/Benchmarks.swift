@@ -25,18 +25,33 @@ let benchmarks = {
         .wallClock,
     ]
 
-  Benchmark(
-    "MTELG.immediateTasksThroughput",
-    configuration: Benchmark.Configuration(
-      metrics: defaultMetrics,
-      scalingFactor: .mega,
-      maxDuration: .seconds(10_000_000),
-      maxIterations: 5
-    )
-  ) { benchmark in
-    func noOp() {}
-    for _ in benchmark.scaledIterations {
-      eventLoop.execute { noOp() }
+    Benchmark(
+        "MTELG.immediateTasksThroughput",
+        configuration: Benchmark.Configuration(
+            metrics: defaultMetrics,
+            scalingFactor: .mega,
+            maxDuration: .seconds(10_000_000),
+            maxIterations: 5
+        )
+    ) { benchmark in
+        func noOp() {}
+        for _ in benchmark.scaledIterations {
+            eventLoop.execute { noOp() }
+        }
+    }
+
+    Benchmark(
+        "MTELG.scheduleTask(in:_:)",
+        configuration: Benchmark.Configuration(
+            metrics: defaultMetrics,
+            scalingFactor: .mega,
+            maxDuration: .seconds(10_000_000),
+            maxIterations: 5
+        )
+    ) { benchmark in
+        for _ in benchmark.scaledIterations {
+            eventLoop.scheduleTask(in: .hours(1), {})
+        }
     }
 
     Benchmark(
