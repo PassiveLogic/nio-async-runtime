@@ -13,34 +13,34 @@
 import PackageDescription
 
 let package = Package(
-  name: "nio-async-runtime",
-  products: [
-    .library(
-      name: "NIOAsyncRuntime",
-      targets: ["NIOAsyncRuntime"]
-    )
-  ],
-  dependencies: [
-    .package(url: "https://github.com/apple/swift-atomics.git", from: "1.1.0"),
-    .package(url: "https://github.com/apple/swift-nio.git", from: "2.89.0"),
-  ],
-  targets: [
-    .target(
-      name: "NIOAsyncRuntime",
-      dependencies: [
-        .product(name: "Atomics", package: "swift-atomics"),
-        .product(name: "NIOCore", package: "swift-nio"),
-      ],
-    ),
-    .testTarget(
-      name: "NIOAsyncRuntimeTests",
-      dependencies: [
-        "NIOAsyncRuntime",
-        .product(name: "NIOConcurrencyHelpers", package: "swift-nio"),
-        .product(name: "NIOCore", package: "swift-nio"),
-        .product(name: "NIOFoundationCompat", package: "swift-nio"),
-        .product(name: "NIOTestUtils", package: "swift-nio"),
-      ],
-    ),
-  ]
+    name: "nio-async-runtime",
+    products: [
+        .library(
+            name: "NIOAsyncRuntime",
+            targets: ["NIOAsyncRuntime"]
+        )
+    ],
+    dependencies: [
+        .package(url: "https://github.com/apple/swift-atomics.git", from: "1.1.0"),
+        .package(url: "https://github.com/apple/swift-nio.git", from: "2.89.0"),
+    ],
+    targets: [
+        .target(
+            name: "NIOAsyncRuntime",
+            dependencies: [
+                .product(name: "Atomics", package: "swift-atomics"),
+                .product(name: "NIOCore", package: "swift-nio"),
+            ],
+        ),
+        .testTarget(
+            name: "NIOAsyncRuntimeTests",
+            dependencies: [
+                "NIOAsyncRuntime",
+                .product(name: "NIOConcurrencyHelpers", package: "swift-nio"),
+                .product(name: "NIOCore", package: "swift-nio"),
+                .product(name: "NIOFoundationCompat", package: "swift-nio"),
+                .product(name: "NIOTestUtils", package: "swift-nio"),
+            ],
+        ),
+    ]
 )
