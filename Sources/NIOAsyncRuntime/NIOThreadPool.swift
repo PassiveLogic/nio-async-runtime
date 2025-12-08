@@ -164,7 +164,7 @@ public final class NIOThreadPool: @unchecked Sendable {
     }()
 
     @preconcurrency
-    public func shutdownGracefully(_ callback: @escaping @Sendable (Error?) -> Void = { _ in }) {
+    public func shutdownGracefully(_ callback: @escaping @Sendable (Error?) -> Void) {
         _shutdownGracefully {
             callback(nil)
         }

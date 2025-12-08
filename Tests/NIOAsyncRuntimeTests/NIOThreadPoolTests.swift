@@ -27,50 +27,55 @@ class NIOThreadPoolTest {
     }
 
     @Test
-    func testThreadPoolStartsMultipleTimes() throws {
+    func testThreadPoolStartsMultipleTimes() async throws {
         let numberOfThreads = 1
         let pool = NIOThreadPool(numberOfThreads: numberOfThreads)
         pool.start()
-        defer {
-            #expect(throws: Never.self) { pool.shutdownGracefully() }
-        }
 
-        let completionGroup = DispatchGroup()
+        await withTaskGroup(of: Void.self) { group in
+            // The lock here is arguably redundant with the dispatchgroup, but let's make
+            // this test thread-safe even something goes wrong
+            let threadOne: NIOLockedValueBox<UInt?> = NIOLockedValueBox(UInt?.none)
+            let threadTwo: NIOLockedValueBox<UInt?> = NIOLockedValueBox(UInt?.none)
 
-        // The lock here is arguably redundant with the dispatchgroup, but let's make
-        // this test thread-safe even something goes wrong
-        let threadOne: NIOLockedValueBox<UInt?> = NIOLockedValueBox(UInt?.none)
-        let threadTwo: NIOLockedValueBox<UInt?> = NIOLockedValueBox(UInt?.none)
+            let expectedValue: UInt = 1
 
-        let expectedValue: UInt = 1
-
-        completionGroup.enter()
-        pool.submit { s in
-            precondition(s == .active)
-            threadOne.withLockedValue { threadOne in
-                #expect(threadOne == nil)
-                threadOne = expectedValue
+            group.addTask {
+                await withCheckedContinuation { continuation in
+                    pool.submit { s in
+                        precondition(s == .active)
+                        threadOne.withLockedValue { threadOne in
+                            #expect(threadOne == nil)
+                            threadOne = expectedValue
+                        }
+                        continuation.resume()
+                    }
+                }
             }
-            completionGroup.leave()
-        }
 
-        // Now start the thread pool again. This must not destroy existing threads, so our thread should be the same.
-        pool.start()
-        completionGroup.enter()
-        pool.submit { s in
-            precondition(s == .active)
-            threadTwo.withLockedValue { threadTwo in
-                #expect(threadTwo == nil)
-                threadTwo = expectedValue
+            // Now start the thread pool again. This must not destroy existing threads, so our thread should be the same.
+            pool.start()
+            group.addTask {
+                await withCheckedContinuation { continuation in
+                    pool.submit { s in
+                        precondition(s == .active)
+                        threadTwo.withLockedValue { threadTwo in
+                            #expect(threadTwo == nil)
+                            threadTwo = expectedValue
+                        }
+                        continuation.resume()
+                    }
+                }
             }
-            completionGroup.leave()
+
+            await group.waitForAll()
+
+            #expect(threadOne.withLockedValue { $0 } != nil)
+            #expect(threadTwo.withLockedValue { $0 } != nil)
+            #expect(threadOne.withLockedValue { $0 } == threadTwo.withLockedValue { $0 })
         }
 
-        completionGroup.wait()
-
-        #expect(threadOne.withLockedValue { $0 } != nil)
-        #expect(threadTwo.withLockedValue { $0 } != nil)
-        #expect(threadOne.withLockedValue { $0 } == threadTwo.withLockedValue { $0 })
+        await #expect(throws: Never.self) { try await pool.shutdownGracefully() }
     }
 
     @Test
