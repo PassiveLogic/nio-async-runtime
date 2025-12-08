@@ -42,6 +42,10 @@ let package = Package(
             name: "ExampleMTELG",
             dependencies: [.target(name: "NIOAsyncRuntime")],
         ),
+        .executableTarget(
+            name: "ExampleNIOThreadPool",
+            dependencies: [.target(name: "NIOAsyncRuntime")],
+        ),
         .testTarget(
             name: "NIOAsyncRuntimeTests",
             dependencies: [
