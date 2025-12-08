@@ -57,16 +57,25 @@ public final class MultiThreadedEventLoopGroup: EventLoopGroup, @unchecked Senda
         queue: DispatchQueue, _ onCompletion: @escaping @Sendable (Error?) -> Void
     ) {
         Task {
-            await _GroupContextKey.$isFromMultiThreadedEventLoopGroup.withValue(true) {
-                for loop in loops { await loop.closeGracefully() }
-
+            do {
+                try await shutdownGracefully()
                 queue.async {
                     onCompletion(nil)
+                }
+            } catch {
+                queue.async {
+                    onCompletion(error)
                 }
             }
         }
     }
     #endif // canImport(Dispatch)
+
+    public func shutdownGracefully() async throws {
+        await _GroupContextKey.$isFromMultiThreadedEventLoopGroup.withValue(true) {
+            for loop in loops { await loop.closeGracefully() }
+        }
+    }
 
     public static let singleton = MultiThreadedEventLoopGroup()
 
