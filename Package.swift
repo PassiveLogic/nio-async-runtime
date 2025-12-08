@@ -38,6 +38,10 @@ let package = Package(
                 .product(name: "NIOCore", package: "swift-nio"),
             ],
         ),
+        .executableTarget(
+            name: "ExampleMTELG",
+            dependencies: [.target(name: "NIOAsyncRuntime")],
+        ),
         .testTarget(
             name: "NIOAsyncRuntimeTests",
             dependencies: [
