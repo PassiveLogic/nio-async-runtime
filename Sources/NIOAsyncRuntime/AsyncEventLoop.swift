@@ -21,7 +21,6 @@ import Dispatch
 // MARK: - AsyncEventLoop -
 
 /// A single‑threaded `EventLoop` implemented solely with Swift Concurrency.
-@available(macOS 13, *)
 public final class AsyncEventLoop: EventLoop, @unchecked Sendable {
     public enum AsynceEventLoopError: Error {
         case cancellationFailure

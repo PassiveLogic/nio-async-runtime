@@ -14,6 +14,12 @@ import PackageDescription
 
 let package = Package(
     name: "nio-async-runtime",
+    platforms: [
+        .macOS(.v13),
+        .iOS(.v16),
+        .watchOS(.v9),
+        .tvOS(.v16),
+    ],
     products: [
         .library(
             name: "NIOAsyncRuntime",

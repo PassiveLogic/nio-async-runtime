@@ -16,13 +16,11 @@ import struct Foundation.UUID
 
 /// Task‑local key that stores the UUID of the `AsyncEventLoop` currently
 /// executing.  Lets us answer `inEventLoop` without private APIs.
-@available(macOS 13, *)
 enum _CurrentEventLoopKey { @TaskLocal static var id: UUID? }
 
 /// This is an actor designed to execute provided tasks in the order they enter the actor.
 /// It also provides task scheduling, time manipulation, pool draining, and other mechanisms
 /// required for fully supporting NIO event loop operations.
-@available(macOS 13, *)
 actor AsyncEventLoopExecutor {
     private let executor: _AsyncEventLoopExecutor
 
@@ -108,7 +106,6 @@ actor AsyncEventLoopExecutor {
 ///
 /// However, it defers the nonisolated API's to ``AsyncEventLoopExecutor`` which
 /// helps make the isolation boundary very clear.
-@available(macOS 13, *)
 fileprivate actor _AsyncEventLoopExecutor {
     /// Used in unit testing only to enable adjusting
     /// the current time programmatically to test event scheduling and other
@@ -511,7 +508,6 @@ extension EventLoopError {
     static let _shutdown: any Error = EventLoopError.shutdown
 }
 
-@available(macOS 13, *)
 extension _AsyncEventLoopExecutor.ScheduledJob: Comparable {
     static func < (
         lhs: _AsyncEventLoopExecutor.ScheduledJob, rhs: _AsyncEventLoopExecutor.ScheduledJob

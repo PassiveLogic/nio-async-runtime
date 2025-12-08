@@ -24,13 +24,11 @@ import Dispatch
 /// This implementation relies on SwiftConcurrency and does not directly instantiate any actual threads.
 /// This reduces risk and fallout if the event loop group is not shutdown gracefully, compared to the NIOPosix
 /// `MultiThreadedEventLoopGroup` implementation.
-@available(macOS 13, *)
 public final class MultiThreadedEventLoopGroup: EventLoopGroup, @unchecked Sendable {
     /// Task‑local key that stores a boolean that helps AsyncEventLoop know
     /// if shutdown calls are being made from this event loop group, or external
     ///
     /// Safety mechanisms prevent calling shutdown direclty on a loop.
-    @available(macOS 13, *)
     enum _GroupContextKey { @TaskLocal static var isFromMultiThreadedEventLoopGroup: Bool = false }
 
     private let loops: [AsyncEventLoop]
