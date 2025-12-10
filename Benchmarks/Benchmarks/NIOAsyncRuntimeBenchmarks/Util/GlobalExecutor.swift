@@ -15,23 +15,23 @@
 // See https://github.com/apple/swift-nio/blob/main/Benchmarks/Benchmarks/NIOPosixBenchmarks/Benchmarks.swift
 
 #if canImport(Darwin)
-  import Darwin.C
+import Darwin.C
 #elseif canImport(Glibc)
-  import Glibc
+import Glibc
 #else
-  #error("Unsupported platform.")
+#error("Unsupported platform.")
 #endif
 
 // This file allows us to hook the global executor which
 // we can use to mimic task executors for now.
 typealias EnqueueGlobalHook =
-  @convention(thin) (UnownedJob, @convention(thin) (UnownedJob) -> Void) -> Void
+    @convention(thin) (UnownedJob, @convention(thin) (UnownedJob) -> Void) -> Void
 
 var swiftTaskEnqueueGlobalHook: EnqueueGlobalHook? {
-  get { _swiftTaskEnqueueGlobalHook.pointee }
-  set { _swiftTaskEnqueueGlobalHook.pointee = newValue }
+    get { _swiftTaskEnqueueGlobalHook.pointee }
+    set { _swiftTaskEnqueueGlobalHook.pointee = newValue }
 }
 
 private let _swiftTaskEnqueueGlobalHook: UnsafeMutablePointer<EnqueueGlobalHook?> =
-  dlsym(dlopen(nil, RTLD_LAZY), "swift_task_enqueueGlobal_hook").assumingMemoryBound(
-    to: EnqueueGlobalHook?.self)
+    dlsym(dlopen(nil, RTLD_LAZY), "swift_task_enqueueGlobal_hook").assumingMemoryBound(
+        to: EnqueueGlobalHook?.self)
