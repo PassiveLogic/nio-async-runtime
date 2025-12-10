@@ -14,6 +14,12 @@ import PackageDescription
 
 let package = Package(
     name: "nio-async-runtime",
+    platforms: [
+        .macOS(.v13),
+        .iOS(.v16),
+        .watchOS(.v9),
+        .tvOS(.v16),
+    ],
     products: [
         .library(
             name: "NIOAsyncRuntime",
@@ -31,6 +37,14 @@ let package = Package(
                 .product(name: "Atomics", package: "swift-atomics"),
                 .product(name: "NIOCore", package: "swift-nio"),
             ],
+        ),
+        .executableTarget(
+            name: "ExampleMTELG",
+            dependencies: [.target(name: "NIOAsyncRuntime")],
+        ),
+        .executableTarget(
+            name: "ExampleNIOThreadPool",
+            dependencies: [.target(name: "NIOAsyncRuntime")],
         ),
         .testTarget(
             name: "NIOAsyncRuntimeTests",

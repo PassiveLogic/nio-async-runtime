@@ -32,7 +32,6 @@ public enum NIOThreadPoolError: Sendable {
 }
 
 /// Drop‑in stand‑in for `NIOThreadPool`, powered by Swift Concurrency.
-@available(macOS 10.15, *)
 public final class NIOThreadPool: @unchecked Sendable {
     /// The state of the `WorkItem`.
     public enum WorkItemState: Sendable {
@@ -165,13 +164,12 @@ public final class NIOThreadPool: @unchecked Sendable {
     }()
 
     @preconcurrency
-    public func shutdownGracefully(_ callback: @escaping @Sendable (Error?) -> Void = { _ in }) {
+    public func shutdownGracefully(_ callback: @escaping @Sendable (Error?) -> Void) {
         _shutdownGracefully {
             callback(nil)
         }
     }
 
-    @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
     public func shutdownGracefully() async throws {
         try await withCheckedThrowingContinuation { continuation in
             _shutdownGracefully {
