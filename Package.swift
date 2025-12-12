@@ -36,15 +36,15 @@ let package = Package(
             dependencies: [
                 .product(name: "Atomics", package: "swift-atomics"),
                 .product(name: "NIOCore", package: "swift-nio"),
-            ],
+            ]
         ),
         .executableTarget(
             name: "ExampleMTELG",
-            dependencies: [.target(name: "NIOAsyncRuntime")],
+            dependencies: [.target(name: "NIOAsyncRuntime")]
         ),
         .executableTarget(
             name: "ExampleNIOThreadPool",
-            dependencies: [.target(name: "NIOAsyncRuntime")],
+            dependencies: [.target(name: "NIOAsyncRuntime")]
         ),
         .testTarget(
             name: "NIOAsyncRuntimeTests",
@@ -54,7 +54,7 @@ let package = Package(
                 .product(name: "NIOCore", package: "swift-nio"),
                 .product(name: "NIOFoundationCompat", package: "swift-nio"),
                 .product(name: "NIOTestUtils", package: "swift-nio"),
-            ],
+            ]
         ),
     ]
 )
