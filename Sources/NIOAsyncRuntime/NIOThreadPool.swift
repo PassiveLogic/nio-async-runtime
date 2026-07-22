@@ -228,12 +228,34 @@ public final class NIOThreadPool: @unchecked Sendable {
     }
 
     private func workerLoop(identifier _: Int) async {
+        #if os(WASI)
+        // On the single-threaded WASI/JavaScriptEventLoop cooperative executor,
+        // each dequeued item is resumed via a direct task switch that does NOT
+        // unwind the shadow stack, so consecutive items accumulate frames until
+        // the (~128 KiB) stack overflows (__stack_chk_fail). Periodically yield
+        // so the continuation re-enqueues on the global executor and the stack
+        // unwinds. `yieldEveryNWorkItems` is ~1/4 of the measured crash cutoff:
+        // a stack probe showed ~810 B accumulated per drained item — this is
+        // content-independent (the item's own work pops before the next item),
+        // so the ~128 KiB stack overflows after ~160 items; N = 40 keeps a ~4x
+        // margin (≈32 KiB, leaving ample room for a work item's transient
+        // depth). Gated to WASI — multi-threaded hosts unwind normally.
+        let yieldEveryNWorkItems = 40
+        var processedSinceYield = 0
+        #endif
         while let workItem = await workQueue.nextWorkItem(shutdownFlag: shutdownFlag) {
             if self.shutdownFlag.load(ordering: .acquiring) {
                 workItem.workItem(.cancelled)
             } else {
                 workItem.workItem(.active)
             }
+            #if os(WASI)
+            processedSinceYield += 1
+            if processedSinceYield >= yieldEveryNWorkItems {
+                processedSinceYield = 0
+                await Task.yield()
+            }
+            #endif
         }
     }
 
